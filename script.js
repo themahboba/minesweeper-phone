@@ -22,12 +22,18 @@ const leaderboardListEl = document.querySelector("#leaderboard-list");
 const clearLeaderboardButton = document.querySelector("#clear-leaderboard");
 const settingsButton = document.querySelector("#settings-button");
 const settingsDialog = document.querySelector("#settings-dialog");
+const gamePanelEl = document.querySelector(".game-panel");
 const backgroundSwatches = document.querySelector("#background-swatches");
+const panelSwatches = document.querySelector("#panel-swatches");
 const customColourInput = document.querySelector("#custom-colour");
 const hexColourInput = document.querySelector("#hex-colour");
+const panelCustomColourInput = document.querySelector("#panel-custom-colour");
+const panelHexColourInput = document.querySelector("#panel-hex-colour");
 
 const BACKGROUNDS = new Set(["night", "forest", "ocean", "berry", "sunrise", "mono", "custom"]);
+const PANEL_COLOURS = new Set(["black", "white", "night", "forest", "ocean", "berry", "sunrise", "mono", "custom"]);
 const DEFAULT_CUSTOM_COLOUR = "#2DD4BF";
+const DEFAULT_PANEL_CUSTOM_COLOUR = "#151C2B";
 
 let state = {};
 
@@ -369,30 +375,36 @@ function rgbToHsl({ r, g, b }) {
   };
 }
 
-function setCustomGradient(hex) {
+function setGradientVars(target, prefix, hex, alpha = 0.24) {
   const { h, s, l } = rgbToHsl(hexToRgb(hex));
   const saturation = Math.max(34, Math.min(76, s));
   const startLight = Math.max(5, Math.min(13, Math.round(l * 0.18)));
   const midLight = Math.max(14, Math.min(26, Math.round(l * 0.38)));
   const endLight = Math.max(18, Math.min(34, Math.round(l * 0.5)));
 
-  document.documentElement.style.setProperty("--bg-radial", `hsla(${h}, ${saturation}%, 62%, 0.24)`);
-  document.documentElement.style.setProperty("--bg-start", `hsl(${h}, ${saturation}%, ${startLight}%)`);
-  document.documentElement.style.setProperty("--bg-mid", `hsl(${(h + 12) % 360}, ${saturation}%, ${midLight}%)`);
-  document.documentElement.style.setProperty("--bg-end", `hsl(${(h + 28) % 360}, ${saturation}%, ${endLight}%)`);
+  target.style.setProperty(`--${prefix}-radial`, `hsla(${h}, ${saturation}%, 62%, ${alpha})`);
+  target.style.setProperty(`--${prefix}-start`, `hsl(${h}, ${saturation}%, ${startLight}%)`);
+  target.style.setProperty(`--${prefix}-mid`, `hsl(${(h + 12) % 360}, ${saturation}%, ${midLight}%)`);
+  target.style.setProperty(`--${prefix}-end`, `hsl(${(h + 28) % 360}, ${saturation}%, ${endLight}%)`);
 }
 
-function clearCustomGradient() {
-  document.documentElement.style.removeProperty("--bg-radial");
-  document.documentElement.style.removeProperty("--bg-start");
-  document.documentElement.style.removeProperty("--bg-mid");
-  document.documentElement.style.removeProperty("--bg-end");
+function clearGradientVars(target, prefix) {
+  target.style.removeProperty(`--${prefix}-radial`);
+  target.style.removeProperty(`--${prefix}-start`);
+  target.style.removeProperty(`--${prefix}-mid`);
+  target.style.removeProperty(`--${prefix}-end`);
 }
 
 function syncCustomColour(hex) {
   customColourInput.value = hex;
   hexColourInput.value = hex;
   localStorage.setItem("minesweeper-custom-colour", hex);
+}
+
+function syncPanelCustomColour(hex) {
+  panelCustomColourInput.value = hex;
+  panelHexColourInput.value = hex;
+  localStorage.setItem("minesweeper-panel-custom-colour", hex);
 }
 
 function applyBackground(background, customHex = localStorage.getItem("minesweeper-custom-colour")) {
@@ -403,9 +415,9 @@ function applyBackground(background, customHex = localStorage.getItem("minesweep
   if (safeBackground === "custom") {
     const safeHex = normalizeHex(customHex || "") || DEFAULT_CUSTOM_COLOUR;
     syncCustomColour(safeHex);
-    setCustomGradient(safeHex);
+    setGradientVars(document.documentElement, "bg", safeHex);
   } else {
-    clearCustomGradient();
+    clearGradientVars(document.documentElement, "bg");
   }
 
   for (const swatch of backgroundSwatches.querySelectorAll("[data-bg-option]")) {
@@ -417,6 +429,30 @@ function handleCustomColour(value) {
   const hex = normalizeHex(value);
   if (!hex) return;
   applyBackground("custom", hex);
+}
+
+function applyPanelColour(panelColour, customHex = localStorage.getItem("minesweeper-panel-custom-colour")) {
+  const safePanelColour = PANEL_COLOURS.has(panelColour) ? panelColour : "night";
+  gamePanelEl.dataset.panel = safePanelColour;
+  localStorage.setItem("minesweeper-panel-colour", safePanelColour);
+
+  if (safePanelColour === "custom") {
+    const safeHex = normalizeHex(customHex || "") || DEFAULT_PANEL_CUSTOM_COLOUR;
+    syncPanelCustomColour(safeHex);
+    setGradientVars(gamePanelEl, "panel", safeHex, 0.14);
+  } else {
+    clearGradientVars(gamePanelEl, "panel");
+  }
+
+  for (const swatch of panelSwatches.querySelectorAll("[data-panel-option]")) {
+    swatch.setAttribute("aria-pressed", String(swatch.dataset.panelOption === safePanelColour));
+  }
+}
+
+function handlePanelCustomColour(value) {
+  const hex = normalizeHex(value);
+  if (!hex) return;
+  applyPanelColour("custom", hex);
 }
 
 function render() {
@@ -554,6 +590,11 @@ backgroundSwatches.addEventListener("click", (event) => {
   if (!button) return;
   applyBackground(button.dataset.bgOption);
 });
+panelSwatches.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-panel-option]");
+  if (!button) return;
+  applyPanelColour(button.dataset.panelOption);
+});
 customColourInput.addEventListener("input", () => {
   handleCustomColour(customColourInput.value);
 });
@@ -563,6 +604,19 @@ hexColourInput.addEventListener("input", () => {
 hexColourInput.addEventListener("blur", () => {
   const hex = normalizeHex(hexColourInput.value) || localStorage.getItem("minesweeper-custom-colour") || DEFAULT_CUSTOM_COLOUR;
   syncCustomColour(hex);
+});
+panelCustomColourInput.addEventListener("input", () => {
+  handlePanelCustomColour(panelCustomColourInput.value);
+});
+panelHexColourInput.addEventListener("input", () => {
+  handlePanelCustomColour(panelHexColourInput.value);
+});
+panelHexColourInput.addEventListener("blur", () => {
+  const hex =
+    normalizeHex(panelHexColourInput.value) ||
+    localStorage.getItem("minesweeper-panel-custom-colour") ||
+    DEFAULT_PANEL_CUSTOM_COLOUR;
+  syncPanelCustomColour(hex);
 });
 
 if ("serviceWorker" in navigator) {
@@ -578,5 +632,9 @@ const safeInitialLevel = LEVELS[initialLevel] ? initialLevel : "easy";
 difficultySelect.value = safeInitialLevel;
 playerNameInput.value = localStorage.getItem("minesweeper-player-name") || "Player";
 syncCustomColour(normalizeHex(localStorage.getItem("minesweeper-custom-colour") || "") || DEFAULT_CUSTOM_COLOUR);
+syncPanelCustomColour(
+  normalizeHex(localStorage.getItem("minesweeper-panel-custom-colour") || "") || DEFAULT_PANEL_CUSTOM_COLOUR
+);
 applyBackground(localStorage.getItem("minesweeper-background") || "night");
+applyPanelColour(localStorage.getItem("minesweeper-panel-colour") || "night");
 startGame(safeInitialLevel);

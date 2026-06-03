@@ -5,6 +5,12 @@
   --bg-start: #0c111d;
   --bg-mid: #151826;
   --bg-end: #251c22;
+  --panel-radial: rgba(45, 212, 191, 0.08);
+  --panel-start: rgba(21, 28, 43, 0.96);
+  --panel-mid: rgba(21, 28, 43, 0.92);
+  --panel-end: rgba(15, 23, 42, 0.94);
+  --panel-text: #f8fafc;
+  --panel-muted: #a7b0c0;
   --panel: #151c2b;
   --panel-2: #1f2937;
   --line: #344054;
@@ -106,8 +112,71 @@ button {
   padding: 14px;
   border: 1px solid rgba(248, 250, 252, 0.12);
   border-radius: 8px;
-  background: rgba(21, 28, 43, 0.92);
+  background:
+    radial-gradient(circle at 15% 0%, var(--panel-radial), transparent 22rem),
+    linear-gradient(145deg, var(--panel-start) 0%, var(--panel-mid) 46%, var(--panel-end) 100%);
+  color: var(--panel-text);
   box-shadow: var(--shadow);
+}
+
+.game-panel[data-panel="black"] {
+  --panel-radial: rgba(148, 163, 184, 0.1);
+  --panel-start: #030712;
+  --panel-mid: #0b1020;
+  --panel-end: #020617;
+  --panel-text: #f8fafc;
+  --panel-muted: #a7b0c0;
+}
+
+.game-panel[data-panel="white"] {
+  --panel-radial: rgba(45, 212, 191, 0.18);
+  --panel-start: #f8fafc;
+  --panel-mid: #e8eef7;
+  --panel-end: #dbe4ef;
+  --panel-text: #111827;
+  --panel-muted: #475569;
+}
+
+.game-panel[data-panel="night"] {
+  --panel-radial: rgba(45, 212, 191, 0.1);
+  --panel-start: #151c2b;
+  --panel-mid: #151826;
+  --panel-end: #251c22;
+}
+
+.game-panel[data-panel="forest"] {
+  --panel-radial: rgba(74, 222, 128, 0.14);
+  --panel-start: #07130f;
+  --panel-mid: #123026;
+  --panel-end: #233017;
+}
+
+.game-panel[data-panel="ocean"] {
+  --panel-radial: rgba(56, 189, 248, 0.16);
+  --panel-start: #07111f;
+  --panel-mid: #0f2a3d;
+  --panel-end: #112b4a;
+}
+
+.game-panel[data-panel="berry"] {
+  --panel-radial: rgba(244, 114, 182, 0.16);
+  --panel-start: #1a0b18;
+  --panel-mid: #2a1636;
+  --panel-end: #3a1230;
+}
+
+.game-panel[data-panel="sunrise"] {
+  --panel-radial: rgba(251, 191, 36, 0.16);
+  --panel-start: #190f18;
+  --panel-mid: #332239;
+  --panel-end: #4a261b;
+}
+
+.game-panel[data-panel="mono"] {
+  --panel-radial: rgba(226, 232, 240, 0.1);
+  --panel-start: #08090c;
+  --panel-mid: #181b22;
+  --panel-end: #25272d;
 }
 
 .topbar,
@@ -203,7 +272,7 @@ h1 {
 }
 
 .stat-label {
-  color: var(--muted);
+  color: var(--panel-muted);
   font-size: 0.72rem;
   text-transform: uppercase;
 }
@@ -535,10 +604,17 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .settings-card {
+  max-height: min(82svh, 720px);
   display: grid;
   gap: 16px;
   padding: 14px;
+  overflow: auto;
   background: rgba(21, 28, 43, 0.98);
+  scrollbar-width: none;
+}
+
+.settings-card::-webkit-scrollbar {
+  display: none;
 }
 
 .settings-head {
@@ -605,9 +681,19 @@ input[type="color"]::-webkit-color-swatch {
   box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.45);
 }
 
-body[data-background="custom"] .colour-picker-wrap,
-body[data-background="custom"] .hex-wrap {
+body[data-background="custom"] .background-custom-colour .colour-picker-wrap,
+body[data-background="custom"] .background-custom-colour .hex-wrap,
+.game-panel[data-panel="custom"] ~ .settings-dialog .panel-custom-colour .colour-picker-wrap,
+.game-panel[data-panel="custom"] ~ .settings-dialog .panel-custom-colour .hex-wrap {
   border-color: rgba(45, 212, 191, 0.75);
+}
+
+.swatch-black span {
+  background: linear-gradient(145deg, #030712, #020617);
+}
+
+.swatch-white span {
+  background: linear-gradient(145deg, #f8fafc, #dbe4ef);
 }
 
 .swatch-night span {

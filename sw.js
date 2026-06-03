@@ -1,4 +1,4 @@
-const CACHE_NAME = "minesweeper-phone-v4";
+const CACHE_NAME = "minesweeper-phone-v5";
 const ASSETS = [
   "./",
   "./index.html",

@@ -118,7 +118,7 @@
                 Mono
               </button>
             </div>
-            <div class="custom-colour">
+            <div class="custom-colour background-custom-colour">
               <label class="colour-picker-wrap">
                 <span>Custom</span>
                 <input id="custom-colour" type="color" value="#2dd4bf" aria-label="Custom background colour" />
@@ -133,6 +133,61 @@
                   pattern="^#[0-9A-Fa-f]{6}$"
                   value="#2dd4bf"
                   aria-label="Hex background colour"
+                />
+              </label>
+            </div>
+          </fieldset>
+          <fieldset class="color-settings">
+            <legend>Game screen colour</legend>
+            <div class="swatch-grid" id="panel-swatches">
+              <button class="swatch swatch-black" type="button" data-panel-option="black" aria-pressed="false">
+                <span></span>
+                Black
+              </button>
+              <button class="swatch swatch-white" type="button" data-panel-option="white" aria-pressed="false">
+                <span></span>
+                White
+              </button>
+              <button class="swatch swatch-night" type="button" data-panel-option="night" aria-pressed="false">
+                <span></span>
+                Night
+              </button>
+              <button class="swatch swatch-forest" type="button" data-panel-option="forest" aria-pressed="false">
+                <span></span>
+                Forest
+              </button>
+              <button class="swatch swatch-ocean" type="button" data-panel-option="ocean" aria-pressed="false">
+                <span></span>
+                Ocean
+              </button>
+              <button class="swatch swatch-berry" type="button" data-panel-option="berry" aria-pressed="false">
+                <span></span>
+                Berry
+              </button>
+              <button class="swatch swatch-sunrise" type="button" data-panel-option="sunrise" aria-pressed="false">
+                <span></span>
+                Sunrise
+              </button>
+              <button class="swatch swatch-mono" type="button" data-panel-option="mono" aria-pressed="false">
+                <span></span>
+                Mono
+              </button>
+            </div>
+            <div class="custom-colour panel-custom-colour">
+              <label class="colour-picker-wrap">
+                <span>Custom</span>
+                <input id="panel-custom-colour" type="color" value="#151c2b" aria-label="Custom game screen colour" />
+              </label>
+              <label class="hex-wrap">
+                <span>Hex</span>
+                <input
+                  id="panel-hex-colour"
+                  type="text"
+                  inputmode="text"
+                  maxlength="7"
+                  pattern="^#[0-9A-Fa-f]{6}$"
+                  value="#151c2b"
+                  aria-label="Hex game screen colour"
                 />
               </label>
             </div>
