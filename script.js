@@ -23,8 +23,11 @@ const clearLeaderboardButton = document.querySelector("#clear-leaderboard");
 const settingsButton = document.querySelector("#settings-button");
 const settingsDialog = document.querySelector("#settings-dialog");
 const backgroundSwatches = document.querySelector("#background-swatches");
+const customColourInput = document.querySelector("#custom-colour");
+const hexColourInput = document.querySelector("#hex-colour");
 
-const BACKGROUNDS = new Set(["night", "forest", "ocean", "berry", "sunrise", "mono"]);
+const BACKGROUNDS = new Set(["night", "forest", "ocean", "berry", "sunrise", "mono", "custom"]);
+const DEFAULT_CUSTOM_COLOUR = "#2DD4BF";
 
 let state = {};
 
@@ -318,14 +321,102 @@ function formatScoreDate(value) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function applyBackground(background) {
+function normalizeHex(value) {
+  const hex = value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(hex)) return hex.toUpperCase();
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) return `#${hex}`.toUpperCase();
+  return null;
+}
+
+function hexToRgb(hex) {
+  const cleanHex = hex.slice(1);
+  return {
+    r: parseInt(cleanHex.slice(0, 2), 16),
+    g: parseInt(cleanHex.slice(2, 4), 16),
+    b: parseInt(cleanHex.slice(4, 6), 16),
+  };
+}
+
+function rgbToHsl({ r, g, b }) {
+  const nextR = r / 255;
+  const nextG = g / 255;
+  const nextB = b / 255;
+  const max = Math.max(nextR, nextG, nextB);
+  const min = Math.min(nextR, nextG, nextB);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const delta = max - min;
+    s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+
+    if (max === nextR) {
+      h = (nextG - nextB) / delta + (nextG < nextB ? 6 : 0);
+    } else if (max === nextG) {
+      h = (nextB - nextR) / delta + 2;
+    } else {
+      h = (nextR - nextG) / delta + 4;
+    }
+
+    h /= 6;
+  }
+
+  return {
+    h: Math.round(h * 360),
+    s: Math.round(s * 100),
+    l: Math.round(l * 100),
+  };
+}
+
+function setCustomGradient(hex) {
+  const { h, s, l } = rgbToHsl(hexToRgb(hex));
+  const saturation = Math.max(34, Math.min(76, s));
+  const startLight = Math.max(5, Math.min(13, Math.round(l * 0.18)));
+  const midLight = Math.max(14, Math.min(26, Math.round(l * 0.38)));
+  const endLight = Math.max(18, Math.min(34, Math.round(l * 0.5)));
+
+  document.documentElement.style.setProperty("--bg-radial", `hsla(${h}, ${saturation}%, 62%, 0.24)`);
+  document.documentElement.style.setProperty("--bg-start", `hsl(${h}, ${saturation}%, ${startLight}%)`);
+  document.documentElement.style.setProperty("--bg-mid", `hsl(${(h + 12) % 360}, ${saturation}%, ${midLight}%)`);
+  document.documentElement.style.setProperty("--bg-end", `hsl(${(h + 28) % 360}, ${saturation}%, ${endLight}%)`);
+}
+
+function clearCustomGradient() {
+  document.documentElement.style.removeProperty("--bg-radial");
+  document.documentElement.style.removeProperty("--bg-start");
+  document.documentElement.style.removeProperty("--bg-mid");
+  document.documentElement.style.removeProperty("--bg-end");
+}
+
+function syncCustomColour(hex) {
+  customColourInput.value = hex;
+  hexColourInput.value = hex;
+  localStorage.setItem("minesweeper-custom-colour", hex);
+}
+
+function applyBackground(background, customHex = localStorage.getItem("minesweeper-custom-colour")) {
   const safeBackground = BACKGROUNDS.has(background) ? background : "night";
   document.body.dataset.background = safeBackground;
   localStorage.setItem("minesweeper-background", safeBackground);
 
+  if (safeBackground === "custom") {
+    const safeHex = normalizeHex(customHex || "") || DEFAULT_CUSTOM_COLOUR;
+    syncCustomColour(safeHex);
+    setCustomGradient(safeHex);
+  } else {
+    clearCustomGradient();
+  }
+
   for (const swatch of backgroundSwatches.querySelectorAll("[data-bg-option]")) {
     swatch.setAttribute("aria-pressed", String(swatch.dataset.bgOption === safeBackground));
   }
+}
+
+function handleCustomColour(value) {
+  const hex = normalizeHex(value);
+  if (!hex) return;
+  applyBackground("custom", hex);
 }
 
 function render() {
@@ -463,6 +554,16 @@ backgroundSwatches.addEventListener("click", (event) => {
   if (!button) return;
   applyBackground(button.dataset.bgOption);
 });
+customColourInput.addEventListener("input", () => {
+  handleCustomColour(customColourInput.value);
+});
+hexColourInput.addEventListener("input", () => {
+  handleCustomColour(hexColourInput.value);
+});
+hexColourInput.addEventListener("blur", () => {
+  const hex = normalizeHex(hexColourInput.value) || localStorage.getItem("minesweeper-custom-colour") || DEFAULT_CUSTOM_COLOUR;
+  syncCustomColour(hex);
+});
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -476,5 +577,6 @@ const initialLevel = new URLSearchParams(window.location.search).get("level");
 const safeInitialLevel = LEVELS[initialLevel] ? initialLevel : "easy";
 difficultySelect.value = safeInitialLevel;
 playerNameInput.value = localStorage.getItem("minesweeper-player-name") || "Player";
+syncCustomColour(normalizeHex(localStorage.getItem("minesweeper-custom-colour") || "") || DEFAULT_CUSTOM_COLOUR);
 applyBackground(localStorage.getItem("minesweeper-background") || "night");
 startGame(safeInitialLevel);

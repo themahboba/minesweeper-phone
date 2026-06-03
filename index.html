@@ -118,6 +118,24 @@
                 Mono
               </button>
             </div>
+            <div class="custom-colour">
+              <label class="colour-picker-wrap">
+                <span>Custom</span>
+                <input id="custom-colour" type="color" value="#2dd4bf" aria-label="Custom background colour" />
+              </label>
+              <label class="hex-wrap">
+                <span>Hex</span>
+                <input
+                  id="hex-colour"
+                  type="text"
+                  inputmode="text"
+                  maxlength="7"
+                  pattern="^#[0-9A-Fa-f]{6}$"
+                  value="#2dd4bf"
+                  aria-label="Hex background colour"
+                />
+              </label>
+            </div>
           </fieldset>
         </form>
       </dialog>
