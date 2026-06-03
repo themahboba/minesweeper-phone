@@ -20,6 +20,10 @@ const flagModeButton = document.querySelector("#flag-mode");
 const playerNameInput = document.querySelector("#player-name");
 const leaderboardListEl = document.querySelector("#leaderboard-list");
 const clearLeaderboardButton = document.querySelector("#clear-leaderboard");
+const scoreDialog = document.querySelector("#score-dialog");
+const scoreForm = document.querySelector("#score-form");
+const scoreNameInput = document.querySelector("#score-name");
+const scoreTimeEl = document.querySelector("#score-time");
 const settingsButton = document.querySelector("#settings-button");
 const settingsDialog = document.querySelector("#settings-dialog");
 const gamePanelEl = document.querySelector(".game-panel");
@@ -36,6 +40,7 @@ const DEFAULT_CUSTOM_COLOUR = "#2DD4BF";
 const DEFAULT_PANEL_CUSTOM_COLOUR = "#151C2B";
 
 let state = {};
+let pendingScore = null;
 
 function newState(levelName = difficultySelect.value) {
   const level = LEVELS[levelName];
@@ -229,7 +234,7 @@ function endGame(won) {
       }
     });
     saveBestTime();
-    recordScore();
+    requestScoreName();
   } else {
     statusEl.textContent = "Boom";
     faceButton.querySelector("span").textContent = ":(";
@@ -278,17 +283,43 @@ function saveScores(scores, levelName = state.levelName) {
   localStorage.setItem(leaderboardKey(levelName), JSON.stringify(scores));
 }
 
-function recordScore() {
-  const scores = getScores();
+function recordScore(score = pendingScore, name = getPlayerName()) {
+  if (!score) return;
+
+  const scores = getScores(score.levelName);
   scores.push({
-    name: getPlayerName(),
-    seconds: state.seconds,
-    date: new Date().toISOString(),
+    name,
+    seconds: score.seconds,
+    date: score.date,
   });
 
   scores.sort((a, b) => a.seconds - b.seconds || new Date(a.date) - new Date(b.date));
-  saveScores(scores.slice(0, 10));
+  saveScores(scores.slice(0, 10), score.levelName);
   renderLeaderboard();
+}
+
+function requestScoreName() {
+  pendingScore = {
+    levelName: state.levelName,
+    seconds: state.seconds,
+    date: new Date().toISOString(),
+  };
+  scoreTimeEl.textContent = `${state.seconds}s`;
+  scoreNameInput.value = getPlayerName();
+  scoreDialog.showModal();
+  scoreNameInput.focus();
+  scoreNameInput.select();
+}
+
+function savePendingScore() {
+  if (!pendingScore) return;
+
+  const name = scoreNameInput.value.trim() || "Player";
+  playerNameInput.value = name;
+  localStorage.setItem("minesweeper-player-name", name);
+  recordScore(pendingScore, name);
+  pendingScore = null;
+  scoreDialog.close();
 }
 
 function renderLeaderboard() {
@@ -577,6 +608,15 @@ clearLeaderboardButton.addEventListener("click", () => {
   localStorage.removeItem(leaderboardKey());
   renderLeaderboard();
 });
+scoreForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  savePendingScore();
+});
+scoreDialog.addEventListener("cancel", (event) => {
+  if (pendingScore) {
+    event.preventDefault();
+  }
+});
 settingsButton.addEventListener("click", () => {
   settingsDialog.showModal();
 });
@@ -631,6 +671,7 @@ const initialLevel = new URLSearchParams(window.location.search).get("level");
 const safeInitialLevel = LEVELS[initialLevel] ? initialLevel : "easy";
 difficultySelect.value = safeInitialLevel;
 playerNameInput.value = localStorage.getItem("minesweeper-player-name") || "Player";
+scoreNameInput.value = playerNameInput.value;
 syncCustomColour(normalizeHex(localStorage.getItem("minesweeper-custom-colour") || "") || DEFAULT_CUSTOM_COLOUR);
 syncPanelCustomColour(
   normalizeHex(localStorage.getItem("minesweeper-panel-custom-colour") || "") || DEFAULT_PANEL_CUSTOM_COLOUR

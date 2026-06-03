@@ -194,6 +194,20 @@
           </fieldset>
         </form>
       </dialog>
+
+      <dialog class="score-dialog" id="score-dialog" aria-labelledby="score-title">
+        <form class="score-card" id="score-form">
+          <div class="score-head">
+            <h2 id="score-title">You cleared it</h2>
+            <span id="score-time">000s</span>
+          </div>
+          <label class="score-name-wrap">
+            <span>Leaderboard name</span>
+            <input id="score-name" type="text" maxlength="16" autocomplete="nickname" required value="Player" />
+          </label>
+          <button class="save-score-button" type="submit">Save score</button>
+        </form>
+      </dialog>
     </main>
 
     <script src="./script.js"></script>
