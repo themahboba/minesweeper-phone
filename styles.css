@@ -1,6 +1,10 @@
 :root {
   color-scheme: dark;
   --bg: #0c111d;
+  --bg-radial: rgba(45, 212, 191, 0.2);
+  --bg-start: #0c111d;
+  --bg-mid: #151826;
+  --bg-end: #251c22;
   --panel: #151c2b;
   --panel-2: #1f2937;
   --line: #344054;
@@ -29,14 +33,49 @@ body {
   margin: 0;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 18% 0%, rgba(45, 212, 191, 0.2), transparent 28rem),
-    linear-gradient(145deg, #0c111d 0%, #151826 42%, #251c22 100%);
+    radial-gradient(circle at 18% 0%, var(--bg-radial), transparent 28rem),
+    linear-gradient(145deg, var(--bg-start) 0%, var(--bg-mid) 42%, var(--bg-end) 100%);
   color: var(--text);
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   touch-action: manipulation;
+}
+
+body[data-background="forest"] {
+  --bg-radial: rgba(74, 222, 128, 0.2);
+  --bg-start: #07130f;
+  --bg-mid: #123026;
+  --bg-end: #233017;
+}
+
+body[data-background="ocean"] {
+  --bg-radial: rgba(56, 189, 248, 0.24);
+  --bg-start: #07111f;
+  --bg-mid: #0f2a3d;
+  --bg-end: #112b4a;
+}
+
+body[data-background="berry"] {
+  --bg-radial: rgba(244, 114, 182, 0.24);
+  --bg-start: #1a0b18;
+  --bg-mid: #2a1636;
+  --bg-end: #3a1230;
+}
+
+body[data-background="sunrise"] {
+  --bg-radial: rgba(251, 191, 36, 0.24);
+  --bg-start: #190f18;
+  --bg-mid: #332239;
+  --bg-end: #4a261b;
+}
+
+body[data-background="mono"] {
+  --bg-radial: rgba(226, 232, 240, 0.14);
+  --bg-start: #08090c;
+  --bg-mid: #181b22;
+  --bg-end: #25272d;
 }
 
 input,
@@ -59,7 +98,7 @@ button {
 }
 
 .game-panel {
-  width: min(100%, 470px);
+  width: min(calc(100vw - 24px), 470px);
   min-height: calc(100svh - 32px);
   display: grid;
   grid-template-rows: auto auto auto minmax(280px, 1fr) auto auto;
@@ -83,6 +122,12 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.top-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
 }
 
 .brand {
@@ -116,7 +161,7 @@ button {
 
 h1 {
   margin: 0;
-  font-size: clamp(1.55rem, 9vw, 2.6rem);
+  font-size: clamp(1.45rem, 8vw, 2.35rem);
   line-height: 0.95;
   letter-spacing: 0;
 }
@@ -131,12 +176,12 @@ h1 {
 }
 
 .icon-button {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   border-radius: 8px;
-  font-size: 1.5rem;
+  font-size: 1.32rem;
 }
 
 .stats {
@@ -452,6 +497,118 @@ input {
 .leaderboard-list .empty-score {
   grid-template-columns: 1fr;
   color: var(--muted);
+}
+
+.settings-dialog {
+  width: min(calc(100vw - 28px), 430px);
+  max-width: none;
+  margin: auto;
+  padding: 0;
+  border: 1px solid rgba(248, 250, 252, 0.16);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.settings-dialog::backdrop {
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.settings-card {
+  display: grid;
+  gap: 16px;
+  padding: 14px;
+  background: rgba(21, 28, 43, 0.98);
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.color-settings {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.color-settings legend {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.swatch {
+  min-width: 0;
+  height: 48px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  padding: 0 10px;
+  border: 1px solid rgba(248, 250, 252, 0.14);
+  border-radius: 8px;
+  background: #0f172a;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-align: left;
+}
+
+.swatch span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(248, 250, 252, 0.7);
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.8);
+}
+
+.swatch[aria-pressed="true"] {
+  border-color: rgba(45, 212, 191, 0.85);
+  box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.45);
+}
+
+.swatch-night span {
+  background: linear-gradient(145deg, #0c111d, #251c22);
+}
+
+.swatch-forest span {
+  background: linear-gradient(145deg, #07130f, #233017);
+}
+
+.swatch-ocean span {
+  background: linear-gradient(145deg, #07111f, #112b4a);
+}
+
+.swatch-berry span {
+  background: linear-gradient(145deg, #1a0b18, #3a1230);
+}
+
+.swatch-sunrise span {
+  background: linear-gradient(145deg, #190f18, #4a261b);
+}
+
+.swatch-mono span {
+  background: linear-gradient(145deg, #08090c, #25272d);
 }
 
 @media (max-width: 360px) {

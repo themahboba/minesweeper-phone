@@ -21,9 +21,14 @@
             <span class="mine-mark" aria-hidden="true"></span>
             <h1>Minesweeper</h1>
           </div>
-          <button class="icon-button" id="new-game" type="button" aria-label="New game" title="New game">
-            <span aria-hidden="true">↻</span>
-          </button>
+          <div class="top-actions">
+            <button class="icon-button" id="settings-button" type="button" aria-label="Settings" title="Settings">
+              <span aria-hidden="true">⚙</span>
+            </button>
+            <button class="icon-button" id="new-game" type="button" aria-label="New game" title="New game">
+              <span aria-hidden="true">↻</span>
+            </button>
+          </div>
         </header>
 
         <div class="stats" aria-label="Game status">
@@ -76,6 +81,46 @@
           <ol id="leaderboard-list" class="leaderboard-list"></ol>
         </section>
       </section>
+
+      <dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
+        <form method="dialog" class="settings-card">
+          <div class="settings-head">
+            <h2 id="settings-title">Settings</h2>
+            <button class="icon-button" id="close-settings" type="submit" aria-label="Close settings" title="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <fieldset class="color-settings">
+            <legend>Background colour</legend>
+            <div class="swatch-grid" id="background-swatches">
+              <button class="swatch swatch-night" type="button" data-bg-option="night" aria-pressed="false">
+                <span></span>
+                Night
+              </button>
+              <button class="swatch swatch-forest" type="button" data-bg-option="forest" aria-pressed="false">
+                <span></span>
+                Forest
+              </button>
+              <button class="swatch swatch-ocean" type="button" data-bg-option="ocean" aria-pressed="false">
+                <span></span>
+                Ocean
+              </button>
+              <button class="swatch swatch-berry" type="button" data-bg-option="berry" aria-pressed="false">
+                <span></span>
+                Berry
+              </button>
+              <button class="swatch swatch-sunrise" type="button" data-bg-option="sunrise" aria-pressed="false">
+                <span></span>
+                Sunrise
+              </button>
+              <button class="swatch swatch-mono" type="button" data-bg-option="mono" aria-pressed="false">
+                <span></span>
+                Mono
+              </button>
+            </div>
+          </fieldset>
+        </form>
+      </dialog>
     </main>
 
     <script src="./script.js"></script>

@@ -20,6 +20,11 @@ const flagModeButton = document.querySelector("#flag-mode");
 const playerNameInput = document.querySelector("#player-name");
 const leaderboardListEl = document.querySelector("#leaderboard-list");
 const clearLeaderboardButton = document.querySelector("#clear-leaderboard");
+const settingsButton = document.querySelector("#settings-button");
+const settingsDialog = document.querySelector("#settings-dialog");
+const backgroundSwatches = document.querySelector("#background-swatches");
+
+const BACKGROUNDS = new Set(["night", "forest", "ocean", "berry", "sunrise", "mono"]);
 
 let state = {};
 
@@ -313,6 +318,16 @@ function formatScoreDate(value) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
+function applyBackground(background) {
+  const safeBackground = BACKGROUNDS.has(background) ? background : "night";
+  document.body.dataset.background = safeBackground;
+  localStorage.setItem("minesweeper-background", safeBackground);
+
+  for (const swatch of backgroundSwatches.querySelectorAll("[data-bg-option]")) {
+    swatch.setAttribute("aria-pressed", String(swatch.dataset.bgOption === safeBackground));
+  }
+}
+
 function render() {
   mineCountEl.textContent = formatNumber(Math.max(0, state.mines - state.flags));
   timerEl.textContent = formatNumber(state.seconds);
@@ -435,6 +450,19 @@ clearLeaderboardButton.addEventListener("click", () => {
   localStorage.removeItem(leaderboardKey());
   renderLeaderboard();
 });
+settingsButton.addEventListener("click", () => {
+  settingsDialog.showModal();
+});
+settingsDialog.addEventListener("click", (event) => {
+  if (event.target === settingsDialog) {
+    settingsDialog.close();
+  }
+});
+backgroundSwatches.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-bg-option]");
+  if (!button) return;
+  applyBackground(button.dataset.bgOption);
+});
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -448,4 +476,5 @@ const initialLevel = new URLSearchParams(window.location.search).get("level");
 const safeInitialLevel = LEVELS[initialLevel] ? initialLevel : "easy";
 difficultySelect.value = safeInitialLevel;
 playerNameInput.value = localStorage.getItem("minesweeper-player-name") || "Player";
+applyBackground(localStorage.getItem("minesweeper-background") || "night");
 startGame(safeInitialLevel);
