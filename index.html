@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111827" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Minesweeper" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Minesweeper</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="game-panel" aria-label="Minesweeper game">
+        <header class="topbar">
+          <div class="brand">
+            <span class="mine-mark" aria-hidden="true"></span>
+            <h1>Minesweeper</h1>
+          </div>
+          <button class="icon-button" id="new-game" type="button" aria-label="New game" title="New game">
+            <span aria-hidden="true">↻</span>
+          </button>
+        </header>
+
+        <div class="stats" aria-label="Game status">
+          <div class="stat">
+            <span class="stat-label">Mines</span>
+            <strong id="mine-count">000</strong>
+          </div>
+          <button class="face-button" id="face" type="button" aria-label="New game" title="New game">
+            <span aria-hidden="true">:)</span>
+          </button>
+          <div class="stat">
+            <span class="stat-label">Time</span>
+            <strong id="timer">000</strong>
+          </div>
+        </div>
+
+        <div class="controls" aria-label="Game controls">
+          <label class="select-wrap">
+            <span>Level</span>
+            <select id="difficulty" aria-label="Difficulty">
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+          <button class="mode-button" id="flag-mode" type="button" aria-pressed="false">
+            <span class="flag-icon" aria-hidden="true">⚑</span>
+            <span>Flag mode</span>
+          </button>
+        </div>
+
+        <div class="board-wrap">
+          <div class="board" id="board" role="grid" aria-label="Minefield"></div>
+        </div>
+
+        <footer class="footer-strip">
+          <span id="status">Ready</span>
+          <span id="best-time">Best --</span>
+        </footer>
+
+        <section class="leaderboard" aria-label="Leaderboard">
+          <div class="leaderboard-head">
+            <h2>Leaderboard</h2>
+            <button class="clear-button" id="clear-leaderboard" type="button">Clear</button>
+          </div>
+          <label class="name-wrap">
+            <span>Name</span>
+            <input id="player-name" type="text" maxlength="16" autocomplete="nickname" value="Player" />
+          </label>
+          <ol id="leaderboard-list" class="leaderboard-list"></ol>
+        </section>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
