@@ -38,6 +38,11 @@ const BACKGROUNDS = new Set(["night", "forest", "ocean", "berry", "sunrise", "mo
 const PANEL_COLOURS = new Set(["black", "white", "night", "forest", "ocean", "berry", "sunrise", "mono", "custom"]);
 const DEFAULT_CUSTOM_COLOUR = "#2DD4BF";
 const DEFAULT_PANEL_CUSTOM_COLOUR = "#151C2B";
+const LEVEL_LABELS = {
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Difficult",
+};
 
 let state = {};
 let pendingScore = null;
@@ -289,6 +294,7 @@ function recordScore(score = pendingScore, name = getPlayerName()) {
   const scores = getScores(score.levelName);
   scores.push({
     name,
+    levelName: score.levelName,
     seconds: score.seconds,
     date: score.date,
   });
@@ -336,15 +342,18 @@ function renderLeaderboard() {
       const item = document.createElement("li");
       const rank = document.createElement("span");
       const name = document.createElement("strong");
+      const level = document.createElement("span");
       const time = document.createElement("span");
       const date = document.createElement("small");
 
       rank.textContent = `#${index + 1}`;
       name.textContent = score.name;
+      level.className = "score-level";
+      level.textContent = LEVEL_LABELS[score.levelName || state.levelName] || score.levelName || state.levelName;
       time.textContent = `${score.seconds}s`;
       date.textContent = formatScoreDate(score.date);
 
-      item.append(rank, name, time, date);
+      item.append(rank, name, level, time, date);
       fragment.appendChild(item);
     });
   }

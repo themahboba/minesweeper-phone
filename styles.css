@@ -556,11 +556,15 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .leaderboard-list li {
-  min-height: 32px;
+  min-height: 46px;
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "rank name time"
+    "rank level date";
   align-items: center;
-  gap: 9px;
+  column-gap: 9px;
+  row-gap: 4px;
   padding: 6px 9px;
   border-radius: 8px;
   background: rgba(15, 23, 42, 0.78);
@@ -568,7 +572,12 @@ input[type="color"]::-webkit-color-swatch {
   font-size: 0.86rem;
 }
 
+.leaderboard-list li > span:first-child {
+  grid-area: rank;
+}
+
 .leaderboard-list strong {
+  grid-area: name;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -576,13 +585,33 @@ input[type="color"]::-webkit-color-swatch {
   color: var(--text);
 }
 
+.leaderboard-list li > span:nth-of-type(3) {
+  grid-area: time;
+  color: var(--text);
+  font-weight: 900;
+}
+
 .leaderboard-list small {
+  grid-area: date;
+  justify-self: end;
   color: #7f8aa0;
   font-size: 0.76rem;
 }
 
+.score-level {
+  grid-area: level;
+  justify-self: start;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.12);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
 .leaderboard-list .empty-score {
   grid-template-columns: 1fr;
+  grid-template-areas: none;
   color: var(--muted);
 }
 
